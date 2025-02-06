@@ -1,16 +1,12 @@
-package com.example.Library.entity;//package com.example.library.entity;
+package com.example.Library.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Table(name = "author_table")
 @Data
@@ -55,7 +51,7 @@ public class Author {
     @Column
     private Date modifiedAt;
 
-    @OneToMany(mappedBy = "author" )
+    @OneToMany(mappedBy = "author")
     private List<Book> books;
 
 

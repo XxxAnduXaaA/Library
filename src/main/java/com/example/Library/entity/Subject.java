@@ -9,10 +9,10 @@ import lombok.Data;
 import java.util.Date;
 import java.util.List;
 
-@Table(name = "genre_table")
+@Table(name = "subject_table")
 @Data
 @Entity
-public class Genre {
+public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -22,7 +22,6 @@ public class Genre {
     @Size(min = 1, max = 255)
     @Column
     private String name;
-
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column
