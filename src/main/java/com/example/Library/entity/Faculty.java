@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.List;
+
 @Table(name = "faculty_table")
 @Entity
 @Data
@@ -17,7 +19,8 @@ public class Faculty {
     @Column(nullable = false)
     private String facultyName;
 
-    private Department department;
+    @OneToMany(mappedBy = "faculty")
+    private List<Department> departments;
 
 
 }
