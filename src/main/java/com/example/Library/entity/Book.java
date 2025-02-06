@@ -20,41 +20,43 @@ import java.util.List;
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long id;
 
-    @Pattern(regexp = "^(?=(?:\\D*\\d){10}(?:(?:\\D*\\d){3})?$)[\\d-]+$")
-    @Size(min = 1, max = 255)
-    @Column(unique = true)
-    private String isbn;
+//    @Pattern(regexp = "^(?=(?:\\D*\\d){10}(?:(?:\\D*\\d){3})?$)[\\d-]+$")
+//    @Size(min = 1, max = 255)
+//    @Column(unique = true)
+//    private String isbn;
 
     @NotBlank(message = "Author is required")
     @ManyToOne
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_id", nullable = false)
     @JsonIgnoreProperties("books")
     private Author author;
 
+    @NotBlank
     @Column(nullable = false)
     private String title;
 
     @NotBlank
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "genre_id")
-    private Genre genre;
+    @ManyToOne(cascade = CascadeType.MERGE) //позже загуглить
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @ManyToOne
     @JoinColumn(name = "publisher_id", nullable = false)
     private Publisher publisher;
 
-    @OneToMany(mappedBy = "book")
-    private List<Review> reviews;
+//    @OneToMany(mappedBy = "book")
+//    private List<Review> reviews;
+//
+//    @OneToMany(mappedBy = "book")
+//    private List<Rating> ratings;
 
-    @OneToMany(mappedBy = "book")
-    private List<Rating> ratings;
-
+    @NotBlank
     @Column(nullable = false)
     private int year;
 
+    @NotBlank
     @Column(nullable = false)
     private int pages;
 
