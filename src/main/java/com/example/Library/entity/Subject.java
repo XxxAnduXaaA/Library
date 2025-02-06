@@ -32,6 +32,6 @@ public class Subject {
 
     @JsonIgnoreProperties("subject")
     @OneToMany(mappedBy = "subject")
-    private List<Book> books;
+    private List<TextBook> textBooks;
 
 }
