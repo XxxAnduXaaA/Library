@@ -51,8 +51,13 @@ public class Author {
     @Column
     private Date modifiedAt;
 
-    @OneToMany(mappedBy = "author")
-    private List<Book> books;
+    @ManyToMany(mappedBy = "author", cascade = { CascadeType.ALL })
+    @JoinTable(
+            name = "Author_TextBook",
+            joinColumns = { @JoinColumn(name = "author_id") },
+            inverseJoinColumns = {@JoinColumn(name = "textbook_id") }
+    )
+    private List<TextBook> textBooks;
 
 
 }

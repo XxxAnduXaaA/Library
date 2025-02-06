@@ -1,23 +1,21 @@
-package com.example.Library.entity;//package com.example.library.entity;
+package com.example.Library.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Date;
 import java.util.List;
 
-@Table(name = "book_table")
+@Table(name = "textbook_table")
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Book {
+public class TextBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,14 +26,22 @@ public class Book {
 //    private String isbn;
 
     @NotBlank(message = "Author is required")
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    @JsonIgnoreProperties("books")
-    private Author author;
+    @ManyToMany(mappedBy = "textbooks")
+    //@JsonIgnoreProperties("books")
+    private List<Author> author;
 
     @NotBlank
     @Column(nullable = false)
     private String title;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String description;
+
+    @NotBlank
+    @ManyToOne
+    @JoinColumn(name = "faculty_id", nullable = false)
+    private Faculty faculty;
 
     @NotBlank
     @ManyToOne(cascade = CascadeType.MERGE) //позже загуглить
