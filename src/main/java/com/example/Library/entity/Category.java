@@ -20,7 +20,7 @@ public class Category {
     private String categoryName;
 
     @OneToMany(mappedBy = "category")
-    private List<Book> books;
+    private List<TextBook> textBooks;
 
 }
 
