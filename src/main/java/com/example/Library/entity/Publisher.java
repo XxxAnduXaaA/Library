@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Entity
-@Table(name = "publishers")
+@Table(name = "publisher_table")
 @Data
 public class Publisher {
 
@@ -20,7 +20,7 @@ public class Publisher {
     private String name;
 
     @OneToMany(mappedBy = "publisher")
-    private List<Book> books;
+    private List<TextBook> textBooks;
 
 }
 
