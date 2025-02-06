@@ -19,29 +19,35 @@ public class Author {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long id;
-
 
     @NotBlank(message = "First name is required")
     @Size(min = 1, max = 255)
-    @Column
+    @Column(nullable = false)
     private String firstName;
 
     @NotBlank(message = "Last name is required")
     @Size(min = 1, max = 255)
-    @Column
+    @Column(nullable = false)
     private String lastName;
 
     @Size(min = 1, max = 255)
     @Column
     private String middleName;
 
-    @Column
-    private Date birthDate;
+    @NotBlank
+    @Column(nullable = false)
+    private String totalWorkExperience;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String SciePedExperience;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String AcademicPosition;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Past(message = "Birth date must be in the past")
     @Column
     private Date createdAt;
 
