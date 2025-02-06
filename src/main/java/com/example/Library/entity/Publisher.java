@@ -1,6 +1,7 @@
 package com.example.Library.entity;//package com.example.library.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
@@ -14,11 +15,9 @@ public class Publisher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false)
-    private String address;
 
     @OneToMany(mappedBy = "publisher")
     private List<Book> books;
