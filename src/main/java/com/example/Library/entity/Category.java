@@ -1,12 +1,13 @@
 package com.example.Library.entity;//package com.example.library.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "category_table")
 @Data
 public class Category {
 
@@ -14,15 +15,11 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(nullable = false, unique = true)
-    private String name;
+    private String categoryName;
 
-    @ManyToMany
-    @JoinTable(
-            name = "book_category",
-            joinColumns = @JoinColumn(name = "category_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
-    )
+    @OneToMany(mappedBy = "category")
     private List<Book> books;
 
 }
