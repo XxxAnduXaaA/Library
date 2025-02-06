@@ -1,12 +1,10 @@
-package com.example.Library.entity;//package com.example.library.entity;
+package com.example.Library.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
-
 @Entity
-@Table(name = "users")
+@Table(name = "user_table")
 @Data
 public class User {
 
@@ -22,12 +20,6 @@ public class User {
 
     @Column(nullable = false)
     private String password;
-
-    @OneToMany(mappedBy = "user")
-    private List<Review> reviews;
-
-    @OneToMany(mappedBy = "user")
-    private List<Rating> ratings;
 
 }
 
