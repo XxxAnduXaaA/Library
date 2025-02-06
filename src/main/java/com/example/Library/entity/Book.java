@@ -39,7 +39,7 @@ public class Book {
 
     @NotBlank
     @ManyToOne(cascade = CascadeType.MERGE) //позже загуглить
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @ManyToOne
