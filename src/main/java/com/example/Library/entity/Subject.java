@@ -15,12 +15,11 @@ import java.util.List;
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long id;
 
     @NotBlank
     @Size(min = 1, max = 255)
-    @Column
+    @Column(nullable = false)
     private String name;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -31,8 +30,8 @@ public class Subject {
     @Column
     private Date modifiedAt;
 
-    @JsonIgnoreProperties("genre")
-    @OneToMany(mappedBy = "genre")
+    @JsonIgnoreProperties("subject")
+    @OneToMany(mappedBy = "subject")
     private List<Book> books;
 
 }
