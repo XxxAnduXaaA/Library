@@ -28,7 +28,7 @@ public class TextBook {
     @NotBlank(message = "Author is required")
     @ManyToMany(mappedBy = "textbooks")
     //@JsonIgnoreProperties("books")
-    private List<Author> author;
+    private List<Author> authors; //Нужно посмотреть, как сделать, чтобы не было два одинаковых автора в списке
 
     @NotBlank
     @Column(nullable = false)
@@ -51,6 +51,14 @@ public class TextBook {
     @ManyToOne
     @JoinColumn(name = "publisher_id", nullable = false)
     private Publisher publisher;
+
+    @ManyToOne
+    @JoinColumn(name = "subject_id", nullable = false)
+    private Subject subject;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
 
 //    @OneToMany(mappedBy = "book")
 //    private List<Review> reviews;
