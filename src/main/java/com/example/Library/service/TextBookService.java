@@ -27,7 +27,7 @@ public class TextBookService {
     private PublisherRepository publisherRepository;
 
 
-    public TextBook createBook(TextBook textBook, List<Author> authors, Subject subject, Faculty faculty, Department department, Publisher publisher, int pages, int year) {
+    public TextBook createTextBook(TextBook textBook) {
 
     List<Author> existingAuthors = new ArrayList<>();
 
@@ -163,11 +163,11 @@ public class TextBookService {
         textBookRepository.deleteBookById(id);
     }
 
-    public TextBook getBook(Long id){
+    public TextBook getTextBook(Long id){
         return textBookRepository.findById(id).orElse(null);
     }
 
-    public List<TextBook> getAllBooks(){
+    public List<TextBook> getAllTextBooks(){
         return textBookRepository.findAll();
     }
 
