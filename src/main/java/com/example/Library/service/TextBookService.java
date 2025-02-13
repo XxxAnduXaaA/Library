@@ -29,6 +29,13 @@ public class TextBookService {
 
     public TextBook createTextBook(TextBook textBook) {
 
+    textBookRepository.findByTitleAndYearAndAuthorsIn
+                    (textBook.getTitle(), textBook.getYear(), textBook.getAuthors())
+            .ifPresent(existingBook -> {
+            throw new RuntimeException("Такой учебник уже существует");
+            });
+
+    List<Author> textBookAuthors = textBook.getAuthors();
     List<Author> existingAuthors = new ArrayList<>();
 
     for (Author author : textBookAuthors) {
