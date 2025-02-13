@@ -1,13 +1,11 @@
 package com.example.Library.repository;//package com.example.library.repository;
 
-import com.example.Library.entity.Genre;
+import com.example.Library.entity.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface GenreRepository extends JpaRepository<Genre, Long> {
+public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
 //    Genre save(Genre genre);
 //
@@ -15,5 +13,5 @@ public interface GenreRepository extends JpaRepository<Genre, Long> {
 //
 //    Genre findById(long id);
 
-    Genre findByName(String genre);
+    Subject findByName(String genre);
 }
