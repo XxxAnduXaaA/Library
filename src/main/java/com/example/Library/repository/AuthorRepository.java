@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface AuthorRepository extends JpaRepository<Author, Long> {
 
 
-    Author findByFirstNameAndMiddleNameAndLastNameAndBirthDate(String firstName, String middleName, String lastName, Date birthDate);
+    Author findByFirstNameAndMiddleNameAndLastNameAndAcademicPosition(String firstName, String middleName, String lastName, String academicPosition);
 
 //
 //    Optional<Author> findById(Long id);
