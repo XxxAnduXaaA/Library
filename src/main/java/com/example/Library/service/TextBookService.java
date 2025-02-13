@@ -88,17 +88,70 @@ public class TextBookService {
 
 
     public TextBook updateBook(Long id, TextBook updatedTextBook){
-        return textBookRepository.findById(id).map(book -> {
-            book.setTitle(updatedTextBook.getTitle());
-            book.setAuthor(updatedTextBook.getAuthor());
-            book.setGenre(updatedTextBook.getGenre());
-            book.setUniversity(updatedTextBook.getUniversity());
-            book.setIsbn(updatedTextBook.getIsbn());
-            book.setYear(updatedTextBook.getYear());
-            book.setPages(updatedTextBook.getPages());
-            return textBookRepository.save(book);
-        }).orElseThrow(() -> new RuntimeException("Book not found"));
-    }
+
+        TextBook existingTextBook = textBookRepository.findById(id).orElseThrow(() -> new RuntimeException("Textbook not found with id: " + id));
+
+        existingTextBook.setTitle(updatedTextBook.getTitle());
+        existingTextBook.setDescription(updatedTextBook.getDescription());
+        existingTextBook.setYear(updatedTextBook.getYear());
+        existingTextBook.setPages(updatedTextBook.getPages());
+        existingTextBook.setModifiedAt(new Date());
+
+        List<Author> updatedAuthors = updatedTextBook.getAuthors();
+        List<Author> existingAuthors = new ArrayList<>();
+
+        for( Author author : updatedAuthors){
+            Author existingAuthor = authorRepository.findByFirstNameAndMiddleNameAndLastNameAndAcademicPosition(author.getFirstName(), author.getMiddleName(), author.getLastName(), author.getAcademicPosition());
+
+            if(existingAuthor == null){
+                existingAuthors.add(authorRepository.save(author));
+            }
+            else{
+                existingAuthors.add(author);
+            }
+
+        }
+
+        existingTextBook.setAuthors(existingAuthors);
+
+        Subject subject = updatedTextBook.getSubject();
+        Subject existingSubject = subjectRepository.findByName(subject.getName());
+
+        if (existingSubject == null) {
+            existingTextBook.setSubject(subjectRepository.save(subject));
+        } else {
+            existingTextBook.setSubject(existingSubject);
+        }
+
+        Faculty faculty = updatedTextBook.getFaculty();
+        Faculty existingFaculty = facultyRepository.findByFacultyName(faculty.getFacultyName());
+
+        if(existingFaculty == null){
+            existingTextBook.setFaculty(facultyRepository.save(faculty));
+        }
+        else {
+            existingTextBook.setFaculty(existingFaculty);
+        }
+
+        Department department = updatedTextBook.getDepartment();
+        Department existingDepartment = departmentRepository.findByDepartmentName(department.getDepartmentName());
+
+        if(existingDepartment == null){
+            existingTextBook.setDepartment(departmentRepository.save(department));
+        }
+        else {
+            existingTextBook.setDepartment(existingDepartment);
+        }
+
+        Publisher publisher = updatedTextBook.getPublisher();
+        Publisher existingPublisher = publisherRepository.findByName(publisher.getName());
+
+        if(existingDepartment == null){
+            existingTextBook.setPublisher(publisherRepository.save(existingPublisher));
+        }
+        else{
+            existingTextBook.setPublisher(publisher);
+        }
 
     public void deleteBook(Long id){
         textBookRepository.deleteBookById(id);
