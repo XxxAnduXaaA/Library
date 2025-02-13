@@ -153,7 +153,13 @@ public class TextBookService {
             existingTextBook.setPublisher(publisher);
         }
 
-    public void deleteBook(Long id){
+        existingTextBook.setModifiedAt(new Date());
+
+        return textBookRepository.save(existingTextBook);
+
+    }
+
+    public void deleteTextBook(Long id){
         textBookRepository.deleteBookById(id);
     }
 
