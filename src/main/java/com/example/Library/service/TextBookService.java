@@ -31,18 +31,20 @@ public class TextBookService {
 
     List<Author> existingAuthors = new ArrayList<>();
 
-    for (Author author : authors) {
+    for (Author author : textBookAuthors) {
         Author existingAuthor = authorRepository.findByFirstNameAndMiddleNameAndLastNameAndAcademicPosition(
                 author.getFirstName(), author.getMiddleName(), author.getLastName(), author.getAcademicPosition());
 
         if (existingAuthor == null) {
-            authorRepository.save(author);
+            existingAuthors.add(authorRepository.save(author));
         } else {
             existingAuthors.add(author);
         }
     }
 
-    textBook.setAuthor(existingAuthors);
+    textBook.setAuthors(existingAuthors);
+
+    Subject subject = textBook.getSubject();
     Subject existingSubject = subjectRepository.findByName(subject.getName());
 
     if (existingSubject == null) {
@@ -51,6 +53,7 @@ public class TextBookService {
         textBook.setSubject(existingSubject);
     }
 
+    Faculty faculty = textBook.getFaculty();
     Faculty existingFaculty = facultyRepository.findByFacultyName(faculty.getFacultyName());
 
     if(existingFaculty == null){
@@ -60,6 +63,7 @@ public class TextBookService {
         textBook.setFaculty(existingFaculty);
     }
 
+    Department department = textBook.getDepartment();
     Department existingDepartment = departmentRepository.findByDepartmentName(department.getDepartmentName());
 
     if(existingDepartment == null){
@@ -69,6 +73,7 @@ public class TextBookService {
         textBook.setDepartment(existingDepartment);
     }
 
+    Publisher publisher = textBook.getPublisher();
     Publisher existingPublisher = publisherRepository.findByName(publisher.getName());
 
     if(existingDepartment == null){
@@ -78,8 +83,6 @@ public class TextBookService {
         textBook.setPublisher(publisher);
     }
 
-    textBook.setPages(pages);
-    textBook.setYear(year);
     textBook.setCreatedAt(new Date());
     textBook.setModifiedAt(new Date());
 
