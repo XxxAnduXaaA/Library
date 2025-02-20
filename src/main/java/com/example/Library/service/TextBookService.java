@@ -13,18 +13,24 @@ import java.util.List;
 @Service
 public class TextBookService {
 
-    @Autowired
-    private TextBookRepository textBookRepository;
-    @Autowired
-    private  AuthorRepository authorRepository;
-    @Autowired
-    private SubjectRepository subjectRepository;
-    @Autowired
-    private FacultyRepository facultyRepository;
-    @Autowired
-    private DepartmentRepository departmentRepository;
-    @Autowired
-    private PublisherRepository publisherRepository;
+    public TextBookService(TextBookRepository textBookRepository, AuthorRepository authorRepository, SubjectRepository subjectRepository, FacultyRepository facultyRepository, DepartmentRepository departmentRepository, PublisherRepository publisherRepository) {
+        this.textBookRepository = textBookRepository;
+        this.authorRepository = authorRepository;
+        this.subjectRepository = subjectRepository;
+        this.facultyRepository = facultyRepository;
+        this.departmentRepository = departmentRepository;
+        this.publisherRepository = publisherRepository;
+    }
+
+
+    private final TextBookRepository textBookRepository;
+    private final AuthorRepository authorRepository;
+    private final SubjectRepository subjectRepository;
+    private final FacultyRepository facultyRepository;
+    private final DepartmentRepository departmentRepository;
+    private final PublisherRepository publisherRepository;
+
+
 
 
     public TextBook createTextBook(TextBook textBook) {
@@ -127,7 +133,13 @@ public class TextBookService {
         Subject subject = updatedTextBook.getSubject();
         Subject existingSubject = subjectRepository.findByName(subject.getName());
 
-        if (existingSubject == null) {
+
+
+
+
+
+
+    if (existingSubject == null) {
             existingTextBook.setSubject(subjectRepository.save(subject));
         } else {
             existingTextBook.setSubject(existingSubject);
