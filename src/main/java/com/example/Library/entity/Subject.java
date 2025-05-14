@@ -4,25 +4,27 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Table(name = "genre_table")
-@Data
+@Table(name = "subject_table")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-public class Genre {
+public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long id;
 
     @NotBlank
     @Size(min = 1, max = 255)
-    @Column
+    @Column(nullable = false)
     private String name;
-
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column
@@ -32,8 +34,10 @@ public class Genre {
     @Column
     private Date modifiedAt;
 
-    @JsonIgnoreProperties("genre")
-    @OneToMany(mappedBy = "genre")
-    private List<Book> books;
+    @JsonIgnoreProperties("subject")
+    @OneToMany(mappedBy = "subject")
+    private List<TextBook> textBooks;
+
+
 
 }

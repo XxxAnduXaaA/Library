@@ -1,13 +1,17 @@
 package com.example.Library.entity;//package com.example.library.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Table(name = "categories")
-@Data
+@Table(name = "category_table")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Category {
 
     @Id
@@ -15,15 +19,10 @@ public class Category {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String name;
+    private String categoryName;
 
-    @ManyToMany
-    @JoinTable(
-            name = "book_category",
-            joinColumns = @JoinColumn(name = "category_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
-    )
-    private List<Book> books;
+    @OneToMany(mappedBy = "category")
+    private List<TextBook> textBooks;
 
 }
 

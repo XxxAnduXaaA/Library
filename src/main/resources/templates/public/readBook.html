@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Читалка</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    #pdf-viewer {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #pdf-page-container {
+      position: relative;
+      display: inline-block;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #pdf-canvas {
+      display: block;
+      border: none;
+    }
+
+    #text-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      pointer-events: auto;
+      user-select: text;
+    }
+
+    #text-layer span {
+      position: absolute !important;
+      color: transparent;
+    }
+
+    #controls {
+      margin: 20px auto;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      max-width: 90%;
+    }
+
+    #controls button {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #controls button:hover {
+      background-color: #357ab8;
+    }
+
+    #controls span {
+      font-size: 18px;
+      padding: 12px 18px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin: 0 10px;
+    }
+
+    #commentModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    #commentModalContent {
+      background: white;
+      padding: 20px;
+      width: 400px;
+      border-radius: 8px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    #commentInput {
+      width: 100%;
+      resize: vertical;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    #notes, #bookmarks {
+      margin-top: 30px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    li button {
+      margin-right: 10px;
+    }
+
+    form {
+      display: inline;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;" oncopy="return false;">
+
+<div class="collapse navbar-collapse" id="navbarNav">
+  <ul class="navbar-nav ms-auto">
+    <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
+    <li class="nav-item"><a class="nav-link" href="/user/profile">Профиль</a></li>
+    <li class="nav-item"><a class="nav-link" href="/auth/login">Выход</a></li>
+  </ul>
+</div>
+
+<h2 style="text-align: center;">Читалка</h2>
+
+<div id="pdf-viewer">
+  <div id="pdf-page-container">
+    <canvas id="pdf-canvas"></canvas>
+    <div id="text-layer"></div>
+  </div>
+</div>
+
+<div id="controls">
+  <button onclick="prevPage()">◀ Назад</button>
+  <span>Страница: <span id="page-num">1</span> / <span id="page-count">?</span></span>
+  <button onclick="nextPage()">Вперёд ▶</button>
+  <button onclick="addBookmark()">🔖 Добавить закладку</button>
+  <button onclick="commentSelection()">📝 Комментировать выделение</button>
+</div>
+
+
+<div id="commentModal">
+  <div id="commentModalContent">
+    <h4>Комментарий к выделению</h4>
+    <p id="selectedTextPreview" style="font-style: italic;"></p>
+    <textarea id="commentInput" rows="4" style="width:100%;"></textarea><br><br>
+    <button onclick="submitComment()">Сохранить</button>
+    <button onclick="closeModal()">Отмена</button>
+  </div>
+</div>
+
+
+<div id="bookmarks">
+  <h4>Закладки:</h4>
+  <ul>
+    <li th:each="bookmark : ${bookmarks}">
+      <button th:onclick="'goToPage(' + ${bookmark.pageNumber} + ')'">Страница [[${bookmark.pageNumber}]]</button>
+      <form th:action="@{/books/{bookId}/bookmarks/delete/{bookmarkId}(bookId=${book.id}, bookmarkId=${bookmark.id})}" method="post" style="display: inline;">
+        <button type="submit">Удалить</button>
+      </form>
+    </li>
+  </ul>
+</div>
+
+<div id="notes">
+  <h4>Заметки:</h4>
+  <ul>
+    <li th:each="note : ${notes}">
+      <strong>Страница [[${note.pageNumber}]]:</strong> [[${note.comment}]]
+
+      <div th:if="${note.selectedText}">
+        <strong>Выделенный текст: </strong>
+        <span style="color: #FF9900; font-style: italic;">[[${note.selectedText}]]</span>
+      </div>
+    </li>
+  </ul>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+
+
+<script>
+  let currentPage = [[${page}]];
+  let pdfDoc = null;
+  let totalPages = 0;
+
+  // PDF URL — получаем из Thymeleaf или захардкожено
+  const filePath = "[[${book.filePath}]]";
+  const url = "/uploads/" + filePath;
+  const textBookId = '[[${book.id}]]';
+
+  const canvas = document.getElementById('pdf-canvas');
+  const ctx = canvas.getContext('2d');
+  const textLayerDiv = document.getElementById('text-layer');
+  const pageContainer = document.getElementById('pdf-page-container');
+
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+  pdfjsLib.getDocument(url).promise.then(pdf => {
+    pdfDoc = pdf;
+    totalPages = pdfDoc.numPages;
+    document.getElementById("page-count").textContent = totalPages;
+    renderPage(currentPage);
+  });
+
+  function renderPage(num) {
+    pdfDoc.getPage(num).then(page => {
+      const scale = 1.5;
+      const viewport = page.getViewport({ scale });
+
+      // Устанавливаем размеры canvas
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      // Устанавливаем размеры контейнера
+      pageContainer.style.width = `${viewport.width}px`;
+      pageContainer.style.height = `${viewport.height}px`;
+
+      // Очищаем и настраиваем text-layer
+      textLayerDiv.innerHTML = '';
+      textLayerDiv.setAttribute('class', 'textLayer');
+      textLayerDiv.style.position = 'absolute';
+      textLayerDiv.style.top = '0';
+      textLayerDiv.style.left = '0';
+      textLayerDiv.style.width = `${viewport.width}px`;
+      textLayerDiv.style.height = `${viewport.height}px`;
+      textLayerDiv.style.transform = ''; // важно! сбрасываем
+      textLayerDiv.style.pointerEvents = 'auto';
+      textLayerDiv.style.userSelect = 'text';
+
+      // Отрисовка PDF на canvas
+      // const renderContext = {
+      //   canvasContext: ctx,
+      //   viewport: viewport
+      // };
+      // page.render(renderContext);
+
+      // Отрисовка текстового слоя
+      page.getTextContent().then(textContent => {
+        pdfjsLib.renderTextLayer({
+          textContent,
+          container: textLayerDiv,
+          viewport: viewport,
+          enhanceTextSelection: true
+        }).promise.then(() => {
+          // Подправим стили ещё раз после отрисовки текста
+          textLayerDiv.style.width = `${viewport.width}px`;
+          textLayerDiv.style.height = `${viewport.height}px`;
+          textLayerDiv.style.transform = '';
+
+          const spans = textLayerDiv.querySelectorAll('span');
+          spans.forEach(span => {
+            const fontSize = parseFloat(window.getComputedStyle(span).fontSize); // Берём текущий font-size в пикселях
+            span.style.fontSize = (fontSize * viewport.scale / 1.2) + 'px'; // Пересчитываем под масштаб
+            span.style.lineHeight = '1'; // или 1.1, в зависимости от стил
+          });
+
+          spans.forEach(span => {
+            const scaleAdjustedSpacing = (viewport.scale > 2.0) ? '3px' : '1.5px';  // Если масштаб больше 2.0, увеличиваем интервал между словами
+            span.style.wordSpacing = scaleAdjustedSpacing;
+          });
+
+          page.render({
+            canvasContext: ctx,
+            viewport: viewport
+          });
+        });
+      });
+
+
+
+      document.getElementById('page-num').textContent = num;
+    });
+  }
+
+  function goToPage(page) {
+    currentPage = page;
+    renderPage(currentPage);
+  }
+
+
+  function nextPage() {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderPage(currentPage);
+    }
+  }
+
+  function prevPage() {
+    if (currentPage > 1) {
+      currentPage--;
+      renderPage(currentPage);
+    }
+  }
+
+  function addBookmark() {
+    fetch('/books/[[${book.id}]]/bookmarks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        page: currentPage
+      })
+    })
+            .then(response => {
+              if (response.ok) {
+                alert("Закладка добавлена!");
+              } else {
+                alert("Ошибка при добавлении закладки");
+              }
+            });
+  }
+
+  function openModal() {
+    document.getElementById('noteModal').style.display = 'flex';
+  }
+
+  let selection = '';
+  function commentSelection() {
+    selection = window.getSelection().toString().trim();
+    if (!selection) {
+      alert("Сначала выделите текст.");
+      return;
+    }
+
+    document.getElementById('selectedTextPreview').textContent = `"${selection}"`;
+    document.getElementById('commentModal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('commentModal').style.display = 'none';
+    document.getElementById('commentInput').value = '';
+  }
+
+  function submitComment() {
+    const comment = document.getElementById('commentInput').value.trim();
+
+
+    if (!comment || !selection) {
+      alert("Пустая заметка или текст.");
+      return;
+    }
+
+    // Отправка на бэкенд
+    fetch('/books/[[${book.id}]]/notes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        text: comment,
+        selectedText: selection,
+        page: currentPage
+      })
+    }).then(res => {
+      if (res.ok) {
+        alert("Комментарий сохранён!");
+        location.reload();
+      } else {
+        alert("Ошибка при сохранении.");
+      }
+    });
+
+    closeModal();
+  }
+
+  // Блокировка Ctrl+C
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+      e.preventDefault();
+      alert("Копирование запрещено.");
+    }
+  });
+
+</script>
+
+</body>
+</html>

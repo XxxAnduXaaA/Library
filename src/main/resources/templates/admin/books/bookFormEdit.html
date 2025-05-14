@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${textBook.id == null ? 'Добавить книгу' : 'Редактировать книгу'}"></title>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/admin">Админ-панель</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
+        <li class="nav-item"><a class="nav-link" href="/admin">Админ-панель</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-5">
+  <h2 th:text="${textBook.id == null ? 'Добавить книгу' : 'Редактировать книгу'}"></h2>
+
+  <form th:action="${textBook.id == null} ? @{/admin/books/add} : @{/admin/books/edit/{id}(id=${textBook.id})}"
+        method="post" th:object="${textBook}">
+
+    <input type="hidden" th:if="${textBook.id != null}" th:field="*{id}"/>
+
+    <div class="mb-3">
+      <label class="form-label">Название</label>
+      <input type="text" class="form-control" th:field="*{title}" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Описание</label>
+      <textarea class="form-control" th:field="*{description}"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Авторы</label>
+      <select class="form-control" id="authorsSelect" name="authorsInput" multiple th:field="*{authorsInput}">
+        <option th:each="author : ${authors}"
+                th:value="${author.id}"
+                th:text="${author.firstName + ' ' + author.lastName}"
+                th:selected="${textBook.authorsInput != null and textBook.authorsInput.contains(author.id)}">
+        </option>
+      </select>
+    </div>
+
+    <script>
+      $(document).ready(function() {
+        $("#authorsSelect").select2({
+          tags: true,
+          tokenSeparators: [','],
+          placeholder: "Выберите авторов или введите новых"
+        });
+        $("#publisherSelect").select2({
+          tags: true,
+          placeholder: "Выберите или введите нового издателя"
+        });
+
+        $("#subjectSelect").select2({
+          tags: true,
+          placeholder: "Выберите или введите новый предмет"
+        });
+
+        $("form").on("submit", function (e) {
+          if ($("#authorsSelect").val().length === 0) {
+            alert("Пожалуйста, выберите хотя бы одного автора.");
+            $("#authorsSelect").focus();
+            e.preventDefault(); // Отменяет отправку формы
+          }
+        });
+
+        filterDepartments();
+      });
+
+      function filterDepartments() {
+        let selectedFacultyId = document.getElementById('faculties').value;
+        let departmentSelect = document.getElementById('departments');
+        let options = departmentSelect.getElementsByTagName('option');
+
+        for (let i = 0; i < options.length; i++) {
+          let option = options[i];
+          let facultyId = option.getAttribute('data-faculty-id');
+          option.style.display = (facultyId == selectedFacultyId || selectedFacultyId == "") ? "block" : "none";
+        }
+      }
+
+      window.onload = function() {
+        filterDepartments(); // Фильтруем кафедры сразу при загрузке
+      };
+    </script>
+
+    <div class="mb-3">
+      <label class="form-label">Год</label>
+      <input type="text" class="form-control" th:field="*{year}" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Страницы</label>
+      <input type="text" class="form-control" th:field="*{pages}" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Факультет</label>
+      <select class="form-control" id="faculties" name="faculties" onchange="filterDepartments()">
+        <option th:each="faculty : ${faculties}" th:value="${faculty.id}" th:text="${faculty.facultyName}"></option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Категория</label>
+      <select class="form-control" th:field="*{category.id}">
+        <option th:each="category : ${categories}"
+                th:value="${category.id}"
+                th:text="${category.categoryName}"></option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Издатель</label>
+      <select class="form-control" id="publisherSelect" name="publisherInput" th:field="*{publisherInput}">
+        <option th:each="publisher : ${publishers}" th:value="${publisher.name}" th:text="${publisher.name}" th:selected="${textBook.publisherInput != null and textBook.publisherInput.contains(publisher.id)}"></option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Предмет</label>
+      <select class="form-control" id="subjectSelect" name="subjectInput" th:field="*{subjectInput}">
+        <option th:each="subject : ${subjects}" th:value="${subject.name}" th:text="${subject.name}" th:selected="${textBook.subjectInput != null and textBook.subjectInput.contains(subject.id)}"></option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Кафедра</label>
+      <select class="form-control" id="departments" th:field="*{department.id}">
+        <option th:each="department : ${departments}" th:value="${department.id}" th:text="${department.departmentName}" th:data-faculty-id="${department.faculty.id}"></option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn"
+            th:classappend="${textBook.id == null ? 'btn-success' : 'btn-warning'}"
+            th:text="${textBook.id == null ? 'Сохранить' : 'Обновить'}"></button>
+  </form>
+</div>
+</body>
+</html>

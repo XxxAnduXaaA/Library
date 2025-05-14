@@ -10,8 +10,11 @@
     @Service
     public class PublisherService {
 
-        @Autowired
-        private PublisherRepository publisherRepository;
+        private final PublisherRepository publisherRepository;
+
+        public PublisherService(PublisherRepository publisherRepository) {
+            this.publisherRepository = publisherRepository;
+        }
 
         public List<Publisher> getAllPublishers() {
             return publisherRepository.findAll();
@@ -22,13 +25,17 @@
         }
 
         public Publisher createPublisher(Publisher publisher) {
+
+            publisherRepository.findByName(publisher.getName()).ifPresent(existingPublisher -> {
+                throw new RuntimeException("Такой издатель уже существует");
+            });
+
             return publisherRepository.save(publisher);
         }
 
         public Publisher updatePublisher(Long id, Publisher updatedPublisher) {
             return publisherRepository.findById(id).map(publisher -> {
                 publisher.setName(updatedPublisher.getName());
-                publisher.setAddress(updatedPublisher.getAddress());
                 return publisherRepository.save(publisher);
             }).orElseThrow(() -> new RuntimeException("Publisher not found"));
         }

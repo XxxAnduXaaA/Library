@@ -1,35 +1,67 @@
 package com.example.Library.service;
 
+import com.example.Library.entity.Author;
 import com.example.Library.entity.User;
+import com.example.Library.repository.AuthorRepository;
 import com.example.Library.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final AuthorRepository authorRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, AuthorRepository authorRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.authorRepository = authorRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Такого пользователя не существует"));
     }
 
-    public User createUser(User user) {
+    public User registerUser(String email, String password) {
+
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRoles(Collections.singleton("ROLE_USER"));
+
+        return userRepository.save(user);
+
+//        return userRepository.findByNameAndEmail(user.getName(), user.getEmail()).ifPresent(existingUser -> {
+//            throw new RuntimeException("Такой пользователь уже существует");
+//        });
+    }
+
+    public User registerUser(String email, String password, String role) {
+
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRoles(Collections.singleton(role));
+
         return userRepository.save(user);
     }
 
     public User updateUser(Long id, User updatedUser) {
+        System.out.println(updatedUser.getEmail());
         return userRepository.findById(id).map(user -> {
-            user.setName(updatedUser.getName());
             user.setEmail(updatedUser.getEmail());
-            user.setPassword(updatedUser.getPassword());
+            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+            user.setRoles(updatedUser.getRoles());
             return userRepository.save(user);
         }).orElseThrow(() -> new RuntimeException("User not found"));
     }
@@ -37,5 +69,7 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
+
 }
 
