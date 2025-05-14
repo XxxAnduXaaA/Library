@@ -2,25 +2,26 @@ package com.example.Library.service;//package com.example.library.service;
 
 import com.example.Library.entity.Author;
 import com.example.Library.repository.AuthorRepository;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AuthorService {
 
-    @Autowired
-    private AuthorRepository authorRepository;
+    private final AuthorRepository authorRepository;
+
+    public AuthorService(AuthorRepository authorRepository) {
+        this.authorRepository = authorRepository;
+    }
 
 
     public Author createAuthor(Author author) {
 
-        if(authorRepository.findByFirstNameAndMiddleNameAndLastNameAndBirthDate(author.getFirstName(),
-                author.getMiddleName(), author.getLastName(), author.getBirthDate()) == null){
+        if(authorRepository.findByFirstNameAndMiddleNameAndLastName(author.getFirstName(),
+                author.getMiddleName(), author.getLastName()) == null){
             author.setCreatedAt(new Date());
             author.setModifiedAt(new Date());
             return authorRepository.save(author);
@@ -32,13 +33,13 @@ public class AuthorService {
     }
 
     public List<Author> getAllAuthors() {
-        List<Author> authors = authorRepository.findAll();
-        return authors;
+        return authorRepository.findAll();
     }
 
-    public Optional<Author> getAuthorById(Long id) {
-        return Optional.ofNullable(authorRepository.findById(id).orElse(null));
+    public Author getAuthorById(Long id) {
+        return authorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Такой автор не найден"));
     }
+
 
     public void deleteAuthor(Long id) {
         authorRepository.deleteById(id);
@@ -46,26 +47,18 @@ public class AuthorService {
 
     public Author updateAuthor(Long id, Author updatedAuthor) {
 
-        Optional<Author> existingAuthor = authorRepository.findById(id);
+        Author existingAuthor = authorRepository.findById(id).orElseThrow(() -> new RuntimeException("Author not found with id: " + id));
 
-        Author author = existingAuthor.get();
+        existingAuthor.setFirstName(updatedAuthor.getFirstName());
+        existingAuthor.setLastName(updatedAuthor.getLastName());
+        existingAuthor.setMiddleName(updatedAuthor.getMiddleName());
+        existingAuthor.setAcademicPosition(updatedAuthor.getAcademicPosition());
+        existingAuthor.setSciePedExperience(updatedAuthor.getAcademicPosition());
+        existingAuthor.setTotalWorkExperience(updatedAuthor.getTotalWorkExperience());
 
+        existingAuthor.setModifiedAt(new Date());
 
-
-        if (existingAuthor != null) {
-            author.setFirstName(updatedAuthor.getFirstName());
-            author.setLastName(updatedAuthor.getLastName());
-            author.setMiddleName(updatedAuthor.getMiddleName());
-            author.setBirthDate(updatedAuthor.getBirthDate());
-
-            author.setModifiedAt(new Date());
-
-            return authorRepository.save(author);
-        }
-
-        else {
-            return null;
-        }
+        return authorRepository.save(existingAuthor);
     }
 
 //    public Author updatePartialAuthor(Long id, Author partialAuthor) {

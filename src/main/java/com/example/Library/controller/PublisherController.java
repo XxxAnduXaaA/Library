@@ -11,7 +11,7 @@
     import java.util.Optional;
 
     @RestController
-    @RequestMapping("/publishers")
+    @RequestMapping("/api/publishers")
     public class PublisherController {
 
         @Autowired

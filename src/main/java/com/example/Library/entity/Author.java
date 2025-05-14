@@ -3,13 +3,17 @@ package com.example.Library.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
 
+
 @Table(name = "author_table")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Author {
 
@@ -31,17 +35,14 @@ public class Author {
     @Column
     private String middleName;
 
-    @NotBlank
-    @Column(nullable = false)
+    @Column
     private String totalWorkExperience;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String SciePedExperience;
+    @Column
+    private String sciePedExperience;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String AcademicPosition;
+    @Column
+    private String academicPosition;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column
@@ -51,14 +52,18 @@ public class Author {
     @Column
     private Date modifiedAt;
 
-    @ManyToMany(mappedBy = "author", cascade = { CascadeType.ALL })
-    @JoinTable(
-            name = "Author_TextBook",
-            joinColumns = { @JoinColumn(name = "author_id") },
-            inverseJoinColumns = {@JoinColumn(name = "textbook_id") }
-    )
+    @ManyToMany(mappedBy = "authors", cascade = {CascadeType.ALL})
     private List<TextBook> textBooks;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User linkedUser; // кто это в системе
 
+    @Override
+    public String toString() {
+        return firstName + ' ' +
+                lastName + ' ' +
+                middleName;
+    }
 }
 

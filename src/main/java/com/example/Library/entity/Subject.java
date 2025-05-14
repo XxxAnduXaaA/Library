@@ -4,13 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Table(name = "subject_table")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Subject {
     @Id
@@ -33,5 +37,7 @@ public class Subject {
     @JsonIgnoreProperties("subject")
     @OneToMany(mappedBy = "subject")
     private List<TextBook> textBooks;
+
+
 
 }

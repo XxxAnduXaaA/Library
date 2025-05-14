@@ -4,6 +4,8 @@ import com.example.Library.entity.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
@@ -12,6 +14,5 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
 //    List<Genre> findAll();
 //
 //    Genre findById(long id);
-
-    Subject findByName(String genre);
+    Optional<Subject> findByName(String genre);
 }

@@ -2,13 +2,16 @@ package com.example.Library.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 
 @Table(name = "department_table")
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Department {
 
     @Id
@@ -17,11 +20,10 @@ public class Department {
 
     @ManyToOne
     @JoinColumn(name = "faculty_id", nullable = false)
-    @Column
     private Faculty faculty;
 
-    @NotBlank
-    @Column(nullable = false)
+
+    @Column(nullable = false, unique = true)
     private String departmentName;
 
     @OneToMany(mappedBy = "department")

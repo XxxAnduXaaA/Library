@@ -12,7 +12,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/api/categories")
 public class CategoryController {
 
     @Autowired
@@ -29,32 +29,32 @@ public class CategoryController {
         return category.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+//
+//    @PostMapping
+//    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
+//        Category newCategory = categoryService.createCategory(category);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
+//    }
 
-    @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        Category newCategory = categoryService.createCategory(category);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) {
+//        try {
+//            Category updatedCategory = categoryService.updateCategory(id, category);
+//            return ResponseEntity.ok(updatedCategory);
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        }
+//    }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) {
-        try {
-            Category updatedCategory = categoryService.updateCategory(id, category);
-            return ResponseEntity.ok(updatedCategory);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        try {
-            categoryService.deleteCategory(id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+//        try {
+//            categoryService.deleteCategory(id);
+//            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        }
+//    }
 }
 
 

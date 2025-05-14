@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Профиль пользователя</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      margin: 0;
+      padding: 40px;
+    }
+
+    h1, h2 {
+      color: #2c3e50;
+    }
+
+    .section {
+      margin-top: 40px;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .card-meta {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .card-content {
+      font-size: 15px;
+      margin-bottom: 15px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .actions form {
+      display: inline;
+    }
+
+    button {
+      padding: 6px 12px;
+      background-color: #3498db;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .empty-message {
+      color: #777;
+      font-style: italic;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 40px 0;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<h1>Профиль пользователя</h1>
+
+<div class="section">
+  <h2>Мои закладки</h2>
+  <div th:if="${#lists.isEmpty(bookmarks)}">
+    <p class="empty-message">У вас пока нет закладок.</p>
+  </div>
+
+  <div th:each="bookmark : ${bookmarks}" class="card">
+    <div class="card-title" th:text="${bookmark.textBook.title}">Название книги</div>
+    <div class="card-meta">📄 Страница: <span th:text="${bookmark.pageNumber}">1</span></div>
+    <div class="actions">
+      <form th:action="@{/books/read/{id}(id=${bookmark.textBook.id})}" method="get">
+        <input type="hidden" name="page" th:value="${bookmark.pageNumber}" />
+        <button type="submit">Перейти</button>
+      </form>
+      <form th:action="@{books/{bookId}/bookmarks/delete/{bookmarkId}(bookId=${bookmark.textBook.id}, bookmarkId=${bookmark.id})}" method="post">
+        <button type="submit">Удалить</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<div class="section">
+  <h2>Мои заметки</h2>
+  <div th:if="${#lists.isEmpty(notes)}">
+    <p class="empty-message">У вас пока нет заметок.</p>
+  </div>
+
+  <div th:each="note : ${notes}" class="card">
+    <div class="card-title" th:text="${note.textBook.title}">Название книги</div>
+    <div class="card-meta">📄 Страница: <span th:text="${note.pageNumber}">1</span></div>
+    <div class="card-content">
+      💬 <span th:text="${note.comment}">Текст заметки</span>
+    </div>
+    <div class="actions">
+      <form th:action="@{/books/read/{id}(id=${note.textBook.id})}" method="get">
+        <input type="hidden" name="page" th:value="${note.pageNumber}" />
+        <button type="submit">Перейти</button>
+      </form>
+      <form th:action="@{books/{bookId}/notes/delete/{noteId}(bookId=${note.textBook.id}, noteId=${note.id})}" method="post">
+        <button type="submit">Удалить</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
